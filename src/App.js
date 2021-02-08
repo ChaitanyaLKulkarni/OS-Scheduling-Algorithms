@@ -27,7 +27,7 @@ function App() {
     const [scheOpt, setSceOpt] = useState(scheOptions[osOptions[0].value][0]);
     const dist = 25;
     const he = 10;
-    const SPEED = 100;
+    const SPEED = 300;
 
     const pidRef = useRef();
     const nprocs = useRef(1);
