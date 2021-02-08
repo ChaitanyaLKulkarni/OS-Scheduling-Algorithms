@@ -1,5 +1,6 @@
 //Earliest deadline first scheduling (https://en.wikipedia.org/wiki/Earliest_deadline_first_scheduling)
 const edfSolve = (processes, tillNum) => {
+    const opQueue = [];
     const uti = processes.reduce(
         (acc, proc) => acc + proc.execTime / proc.period,
         0
@@ -43,10 +44,24 @@ const edfSolve = (processes, tillNum) => {
                 op.push(maxPriProc);
             }
         }
+        let prevProc = null;
+
+        if (currProc != null) {
+            currProc.processed++;
+            currProc.completed++;
+            prevProc = { ...currProc };
+
+            if (currProc.processed >= currProc.execTime) {
+                currProc = null;
+            }
+        }
         // eslint-disable-next-line no-loop-func
         processes.forEach((process, pi) => {
             if ((i + 1) % process.period === 0) {
-                if (queue.some((p) => p.pid === process.pid)) {
+                if (
+                    queue.some((p) => p.pid === process.pid) ||
+                    currProc?.pid === process.pid
+                ) {
                     //TODO: Fails
                     console.log(`Fails at ${i + 1} for proc ${process.pid}`);
                     i = tillNum;
@@ -55,14 +70,11 @@ const edfSolve = (processes, tillNum) => {
                 }
             }
         });
-        if (currProc != null) {
-            currProc.processed++;
-            currProc.completed++;
-            if (currProc.processed >= currProc.execTime) {
-                currProc = null;
-            }
-        }
+        opQueue.push([
+            prevProc ? { ...prevProc } : null,
+            queue.map((p) => ({ ...p })),
+        ]);
     }
-    return op;
+    return [op, opQueue];
 };
 export default edfSolve;

@@ -1,5 +1,7 @@
 //Rate-monotonic scheduling  (https://en.wikipedia.org/wiki/Rate-monotonic_scheduling)
 const rmsSolve = (processes, tillNum) => {
+    const opQueue = [];
+
     const uti = processes.reduce(
         (acc, proc) => acc + proc.execTime / proc.period,
         0
@@ -37,6 +39,15 @@ const rmsSolve = (processes, tillNum) => {
                 op.push(maxPriProc);
             }
         }
+        let prevProc = null;
+        if (currProc != null) {
+            currProc.processed++;
+            currProc.completed++;
+            prevProc = { ...currProc };
+            if (currProc.processed >= currProc.execTime) {
+                currProc = null;
+            }
+        }
         // eslint-disable-next-line no-loop-func
         processes.forEach((process, pi) => {
             if ((i + 1) % process.period === 0) {
@@ -49,14 +60,11 @@ const rmsSolve = (processes, tillNum) => {
                 }
             }
         });
-        if (currProc != null) {
-            currProc.processed++;
-            currProc.completed++;
-            if (currProc.processed >= currProc.execTime) {
-                currProc = null;
-            }
-        }
+        opQueue.push([
+            prevProc ? { ...prevProc } : null,
+            queue.map((p) => ({ ...p })),
+        ]);
     }
-    return op;
+    return [op, opQueue];
 };
 export default rmsSolve;

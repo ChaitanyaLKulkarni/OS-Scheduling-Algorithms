@@ -34,3 +34,8 @@ td {
     width: 30vw;
     margin: 10px;
 }
+.tables {
+    display: flex;
+    margin: 2%;
+    gap: 6%;
+}
