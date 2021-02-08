@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/OS-Scheduling-Algorithms/static/css/main.e29fd58c.chunk.css",
+    "main.js": "/OS-Scheduling-Algorithms/static/js/main.b793cd33.chunk.js",
+    "main.js.map": "/OS-Scheduling-Algorithms/static/js/main.b793cd33.chunk.js.map",
+    "runtime-main.js": "/OS-Scheduling-Algorithms/static/js/runtime-main.7a417669.js",
+    "runtime-main.js.map": "/OS-Scheduling-Algorithms/static/js/runtime-main.7a417669.js.map",
+    "static/js/2.8dc41893.chunk.js": "/OS-Scheduling-Algorithms/static/js/2.8dc41893.chunk.js",
+    "static/js/2.8dc41893.chunk.js.map": "/OS-Scheduling-Algorithms/static/js/2.8dc41893.chunk.js.map",
+    "index.html": "/OS-Scheduling-Algorithms/index.html",
+    "static/css/main.e29fd58c.chunk.css.map": "/OS-Scheduling-Algorithms/static/css/main.e29fd58c.chunk.css.map",
+    "static/js/2.8dc41893.chunk.js.LICENSE.txt": "/OS-Scheduling-Algorithms/static/js/2.8dc41893.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.7a417669.js",
+    "static/js/2.8dc41893.chunk.js",
+    "static/css/main.e29fd58c.chunk.css",
+    "static/js/main.b793cd33.chunk.js"
+  ]
+}
