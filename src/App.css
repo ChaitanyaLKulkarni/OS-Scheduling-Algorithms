@@ -1,8 +1,8 @@
 .svg_container {
     position: relative;
     top: 10vh;
-    left: 1vw;
-    right: 2vw;
+    left: 0.5%;
+    width: 99%;
 }
 svg {
     border: 1px solid red;
@@ -23,4 +23,14 @@ td {
 .op {
     stroke: black;
     stroke-width: 1;
+}
+.select {
+    /* float: left; */
+    width: 30vw;
+    display: inline-block;
+    margin: 1%;
+}
+.slider {
+    width: 30vw;
+    margin: 10px;
 }

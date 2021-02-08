@@ -1,40 +1,36 @@
-import { useState, useCallback, useRef, useEffect } from "react";
-import produce from "immer";
+import { useState, useRef, useEffect } from "react";
+import Select from "react-select";
+import processInfo from "./processInfo";
 import rmsSolve from "./algorithms/rms";
+import edfSolve from "./algorithms/edf";
+
 import "./App.css";
 
-function getRandomColor() {
-    var letters = "0234678ABDEF";
-    var color = "#";
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * letters.length)];
-    }
-    return color;
-}
-class processInfo {
-    constructor(pid, period, execTime, color) {
-        this.pid = pid;
-        this.period = +period; //casting of string to number
-        this.execTime = +execTime;
-        this.color = color || getRandomColor(); //Getnerate randiom color for the process
-        this.completed = 0;
-        this.processed = 0;
-        this.startFrom = 0;
-    }
-}
+const osOptions = [{ value: "rtos", label: "RTOS" }];
+
+const scheOptions = {
+    rtos: [
+        { value: "rms", label: "Rate-monotonic scheduling" },
+        { value: "edf", label: "Earliest deadline first scheduling" },
+    ],
+};
 
 function App() {
     const [processes, setProcesses] = useState([]); //Input of Process Tabel
     // const [queue, setQueue] = useState([]); //current queue
     const [op, setOp] = useState([]); //Op used for viz
-    const [nPid, setNPid] = useState("");
+    const [nPid, setNPid] = useState("T1");
     const [nPer, setNPer] = useState("");
     const [nExec, setNExec] = useState("");
-
-    const tillNum = 50;
+    const [tillNum, setTillNum] = useState(50);
+    const [osOpt, setOsOpt] = useState(osOptions[0]);
+    const [scheOpt, setSceOpt] = useState(scheOptions[osOptions[0].value][0]);
     const dist = 25;
     const he = 10;
-    const SPEED = 800;
+    const SPEED = 100;
+
+    const pidRef = useRef();
+    const nprocs = useRef(1);
 
     const [isRunning, setIsRunning] = useState(false);
     const runningRef = useRef(isRunning);
@@ -57,23 +53,58 @@ function App() {
     });
     const addNewProcess = () => {
         setProcesses((c) => [...c, new processInfo(nPid, nPer, nExec)]);
-        setNPid("");
+        setNPid("T" + ++nprocs.current);
         setNPer("");
         setNExec("");
+        pidRef.current.focus();
+    };
+
+    const startSim = () => {
+        let resOp = [];
+        let isOk = true;
+        switch (scheOpt.value) {
+            case "rms":
+                resOp = rmsSolve(processes, tillNum);
+                break;
+            case "edf":
+                resOp = edfSolve(processes, tillNum);
+                break;
+            default:
+                console.log("Wrongs");
+                isOk = false;
+                break;
+        }
+        if (isOk) {
+            setCurrTime(0);
+            setOp(resOp);
+            nextStep();
+        } else {
+            setIsRunning(!runningRef.current);
+            runningRef.current = !runningRef.current;
+        }
     };
     return (
         <div id="app">
             <div id="inputs">
-                <select id="os_type">
-                    <option value="rtos">rtos</option>
-                </select>
-                <select id="algo">
-                    <option value="rms">
-                        {/* rate-monotonic scheduling https://en.wikipedia.org/wiki/Rate-monotonic_scheduling */}
-                        RMS
-                    </option>
-                </select>
-                <table id="process_in">
+                <Select
+                    options={osOptions}
+                    onChange={(opt) => {
+                        setOsOpt(opt);
+                    }}
+                    isSearchable={false}
+                    value={osOpt}
+                    className="select"
+                />
+                <Select
+                    options={scheOptions[osOpt.value]}
+                    onChange={(opt) => {
+                        setSceOpt(opt);
+                    }}
+                    value={scheOpt}
+                    isSearchable={false}
+                    className="select"
+                />
+                <table id="process_in" className="table">
                     <tbody>
                         <tr>
                             <th>Process</th>
@@ -99,6 +130,7 @@ function App() {
                         <tr>
                             <td>
                                 <input
+                                    ref={pidRef}
                                     value={nPid}
                                     onChange={(e) => setNPid(e.target.value)}
                                 />
@@ -124,14 +156,25 @@ function App() {
                         </tr>
                     </tbody>
                 </table>
+                <br />
+                Simulate till Time: {tillNum} {"   "}
+                <input
+                    type="range"
+                    min="30"
+                    max="200"
+                    value={tillNum}
+                    className="slider"
+                    onChange={(e) => {
+                        setTillNum(e.target.value);
+                    }}
+                />
+                <br />
                 <button
                     onClick={() => {
                         setIsRunning(!isRunning);
                         runningRef.current = !isRunning;
                         if (!isRunning) {
-                            setCurrTime(0);
-                            setOp(rmsSolve(processes, tillNum));
-                            nextStep();
+                            startSim();
                         }
                     }}
                 >
@@ -141,16 +184,17 @@ function App() {
 
             {/* Viz */}
             <div className="svg_container">
-                <svg viewBox="0 0 1300 200">
+                <svg viewBox={`0 0 ${tillNum * 25.5} 200`}>
                     <g>
                         <line
                             x1="0"
                             y1="100"
-                            x2="1300"
+                            x2="100%"
                             y2="100"
                             className="line"
                         />
-                        {Array.from(Array(tillNum)).map((_, i) => {
+
+                        {Array.from(Array(200)).map((_, i) => {
                             return (
                                 <g key={"lt" + i.toString()}>
                                     <line
